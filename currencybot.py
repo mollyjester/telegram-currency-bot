@@ -3,6 +3,7 @@ from telegram.ext import Updater
 from telegram.ext import CommandHandler
 import urllib.request as request
 import currency
+import datetime
 
 
 class CurrencyBotRU:
@@ -10,11 +11,12 @@ class CurrencyBotRU:
     command_help = 'help'
     command_list = 'list'
     command_find = 'f'
-
     currency_item_format = '%s <b>%s</b> [<b>%s</b>]: %s'
 
     def __init__(self, token):
         self._currency_list = []
+        self.cache_date = datetime.date.today()
+
         self.updater = Updater(token=token)
 
         self.dispatcher = self.updater.dispatcher
@@ -25,10 +27,13 @@ class CurrencyBotRU:
 
     @property
     def currency_list(self):
-        if not self._currency_list:
+        today = datetime.date.today()
+        if (not self._currency_list
+                or self.cache_date != today):
             response = request.urlopen(currency.url_currency, timeout=10)
             cp = currency.CurrencyParser(response.read())
             self._currency_list = cp.parse()
+            self.cache_date = today
         return self._currency_list
 
     @staticmethod
