@@ -37,8 +37,9 @@ class CurrencyBotRU:
         return self._currency_list
 
     @staticmethod
-    def make_list_text(items):
-        text = '\n'.join(
+    def make_list_text(items, date):
+        text = str(date) + '\n'
+        text += '\n'.join(
             [CurrencyBotRU.currency_item_format % (x.nominal, x.name, x.charcode, x.rate)
              for x in items])
         return text
@@ -61,18 +62,18 @@ class CurrencyBotRU:
 
     def _handle_list(self, bot, update):
         bot.send_message(chat_id=update.message.chat_id,
-                         text=CurrencyBotRU.make_list_text(self.currency_list[1:]),
+                         text=CurrencyBotRU.make_list_text(self.currency_list, self.currency_list[0]),
                          parse_mode=telegram.ParseMode.HTML)
 
     def _handle_find(self, bot, update, args):
         if args:
             searchfor = ''.join(args).upper()
-            currencies = [x for x in self.currency_list[1:] if searchfor in str(x).upper()]
+            currencies = [x for x in self.currency_list if searchfor in str(x).upper()]
         else:
             currencies = self.currency_list[1:]
 
         if currencies:
-            text = CurrencyBotRU.make_list_text(currencies)
+            text = CurrencyBotRU.make_list_text(currencies, self.currency_list[0])
         else:
             text = 'Ничего не найдено'
         bot.send_message(chat_id=update.message.chat_id,
