@@ -62,13 +62,13 @@ class CurrencyBotRU:
 
     def _handle_list(self, bot, update):
         bot.send_message(chat_id=update.message.chat_id,
-                         text=CurrencyBotRU.make_list_text(self.currency_list, self.currency_list[0]),
+                         text=CurrencyBotRU.make_list_text(self.currency_list[1:], self.currency_list[0]),
                          parse_mode=telegram.ParseMode.HTML)
 
     def _handle_find(self, bot, update, args):
         if args:
             searchfor = ''.join(args).upper()
-            currencies = [x for x in self.currency_list if searchfor in str(x).upper()]
+            currencies = [x for x in self.currency_list[1:] if searchfor in str(x).upper()]
         else:
             currencies = self.currency_list[1:]
 
@@ -86,4 +86,6 @@ if __name__ == '__main__':
     parser = currency.CurrencyParser(resp.read())
     cur_items = parser.parse()
     curs = [x for x in cur_items[1:] if 'доллар' in str(x)]
-    print(CurrencyBotRU.make_list_text(curs))
+
+    print(CurrencyBotRU.make_list_text(cur_items[1:], cur_items[0]))
+    print(CurrencyBotRU.make_list_text(curs, cur_items[0]))
